@@ -138,6 +138,7 @@
     <Content Include="About.aspx" />
     <Content Include="app\components\EmployeeComponent.html" />
     <Content Include="app\components\EmployeeComponent.js" />
+    <Content Include="app\components\RemoveButtonComponent.js" />
     <Content Include="app\services\EmployeeService.js" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap.css" />

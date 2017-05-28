@@ -3,6 +3,11 @@
         resolve({
             props: ['item'],
             template: template
+            //methods: { 這邊的通知不用了
+            //    remove: function (item) {
+            //        this.$emit('remove', item)
+            //    }
+            //}
         })
     })
 })

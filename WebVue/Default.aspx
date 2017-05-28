@@ -7,19 +7,21 @@
         }
     </style>
     <script src="app/services/employeeService.js"></script>
-    <script src="app/components/EmployeeComponent.js"></script> <%--這裡加入component的file--%>
+    <script src="app/components/EmployeeComponent.js"></script>
+    <script src="app/components/RemoveButtonComponent.js"></script>
     <div id="app">
         <input type="text" name="name" v-model="name" />
-        <input type="button" value="add" @click="add" /> <%--新增的按鈕--%>
+        <input type="button" value="add" @click="add" /> 
         <ul>
             <li v-for="item in employees" :key="item.id">
-                <input type="button" :value="`remove編號${item.id}`" @click="remove(item)" />    
-                <employee :item="item"></employee>    <%--這裡改成使用component的方式--%>  
+                <%--<employee :item="item" @remove="remove"></employee>--%>
+               <employee :item="item"></employee> <%--這邊的remove去掉了--%>
             </li>
         </ul>
     </div>
 
     <script>
+        let bus = new Vue() //新增一個Vue的實體，來達成eventbus的溝通
 
         let app = new Vue({
             el: '#app',
@@ -29,25 +31,31 @@
             },
             methods: {
                 get: function () {
-                    employeeService.get().then(employees=>this.employees = employees) //取得
+                    employeeService.get().then(employees=>this.employees = employees)
                 },
-                add: function () { //對應新增的方法
+                add: function () {
                     let employee = {
                         id: 0,
                         name: this.name
                     }
-                    employeeService.add(employee).then(id=>employee.id = id) //呼叫ajax並使用promise等待新增後的流水號
+                    employeeService.add(employee).then(id=>employee.id = id)
                     this.employees.push(employee)
                     this.name = null
-                },
-                remove: function (item) {
-                    employeeService.remove(item.id).then(x=> {
-                        this.employees = this.employees.filter(employee=>employee !== item)
-                    })
                 }
+                //remove: function (item) { 這邊不需要了，改用bus來接收
+                //    employeeService.remove(item.id).then(x=> {
+                //        this.employees = this.employees.filter(employee=>employee !== item)
+                //    })
+                //}
             },
-            created: function () { //這個代表是vue的生命週期，有興趣可以去參考一下vue的lifecyle
-                this.get() 
+            created: function () {
+                this.get(),
+                bus.$on('removeButtonRemove', function (item) { //bus接受最底下的removeButton發送的通知
+                    employeeService.remove(item.id).then(x=> {
+                        //下面要特別注意一下，這邊不能用this，因為這邊的this是指向eventBus這個Vue的實體，所以我們必須明確呼叫app這個實體
+                        app.employees = app.employees.filter(employee=>employee !== item) 
+                    })
+                })
             }
         })
     </script>
